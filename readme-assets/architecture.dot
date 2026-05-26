@@ -1,0 +1,155 @@
+digraph BeerGameArchitecture {
+    graph [
+        label = "Beer Distribution Game — System Architecture"
+        labelloc = t
+        fontsize = 22
+        fontname = "Helvetica-Bold"
+        bgcolor = "#f5f5f5"
+        rankdir = TB
+        pad = 0.6
+        nodesep = 0.7
+        ranksep = 0.7
+        splines = spline
+    ]
+    node [
+        shape = box
+        style = "filled,rounded"
+        fontname = "Helvetica"
+        fontsize = 11
+        margin = "0.15,0.1"
+    ]
+    edge [
+        fontname = "Helvetica"
+        fontsize = 9
+        color = "#555555"
+    ]
+
+    // ── Standalone Application ────────────────────────────────────────────
+    subgraph cluster_standalone {
+        label = "Standalone Application  (src/main.cpp)"
+        style = "filled,rounded"
+        fillcolor = "#dbeafe"
+        color = "#3b82f6"
+        fontname = "Helvetica-Bold"
+        fontsize = 13
+
+        BGW [label = "BeerGameWindow\n(QMainWindow)", fillcolor = "#bfdbfe", color = "#3b82f6"]
+        IW  [label = "InstructorWindow\n(QWidget / UI)",  fillcolor = "#bfdbfe", color = "#3b82f6"]
+        BGW -> IW
+    }
+
+    // ── Server Application ────────────────────────────────────────────────
+    subgraph cluster_server {
+        label = "Server Application  (src/server/main.cpp)"
+        style = "filled,rounded"
+        fillcolor = "#dcfce7"
+        color = "#16a34a"
+        fontname = "Helvetica-Bold"
+        fontsize = 13
+
+        BGSW [label = "BeerGameServerWindow\n(Server UI / QMainWindow)", fillcolor = "#bbf7d0", color = "#16a34a"]
+        BGS  [label = "BeerGameServer\n(QTcpServer)",                    fillcolor = "#86efac", color = "#16a34a"]
+        PIS  [label = "PlayerInterfaceServer\n(one per client connection)",fillcolor = "#86efac", color = "#16a34a"]
+        BGSW -> BGS [label = "controls"]
+        BGS  -> PIS [label = "creates"]
+    }
+
+    // ── Client Application ────────────────────────────────────────────────
+    subgraph cluster_client {
+        label = "Client Application  (src/client/main.cpp)"
+        style = "filled,rounded"
+        fillcolor = "#fef9c3"
+        color = "#ca8a04"
+        fontname = "Helvetica-Bold"
+        fontsize = 13
+
+        CI [label = "ClientInterface\n(Player UI / QWidget)",  fillcolor = "#fef08a", color = "#ca8a04"]
+        PC [label = "PlayerClient\n(QTcpSocket wrapper)",      fillcolor = "#fef08a", color = "#ca8a04"]
+        CI -> PC [label = "uses"]
+    }
+
+    // ── Core Game Engine ──────────────────────────────────────────────────
+    subgraph cluster_core {
+        label = "Core Game Engine  (src/)"
+        style = "filled,rounded"
+        fillcolor = "#fdf4ff"
+        color = "#9333ea"
+        fontname = "Helvetica-Bold"
+        fontsize = 13
+
+        INST [label = "Instructor\n(creates & configures games)", fillcolor = "#e9d5ff", color = "#9333ea"]
+        G    [label = "Game\n(manages weeks, costs,\norders & shipments)",  fillcolor = "#d8b4fe", color = "#9333ea"]
+        PI   [label = "PlayerInterface\n(base UI / comm layer — QDialog)", fillcolor = "#c4b5fd", color = "#9333ea"]
+
+        INST -> G [label = "creates / configures"]
+
+        // Supply chain sub-cluster
+        subgraph cluster_supply {
+            label = "Supply Chain  (Player)"
+            style = "filled,rounded"
+            fillcolor = "#fff7ed"
+            color = "#ea580c"
+            fontname = "Helvetica-Bold"
+            fontsize = 11
+            rank = same
+
+            CON [label = "Consumer\nrole = 0", fillcolor = "#fed7aa", color = "#ea580c"]
+            RET [label = "Retailer\nrole = 1", fillcolor = "#fed7aa", color = "#ea580c"]
+            WHO [label = "Wholesaler\nrole = 2", fillcolor = "#fed7aa", color = "#ea580c"]
+            DIS [label = "Distributor\nrole = 3", fillcolor = "#fed7aa", color = "#ea580c"]
+            FAC [label = "Factory\nrole = 4", fillcolor = "#fed7aa", color = "#ea580c"]
+        }
+
+        // Event sub-cluster
+        subgraph cluster_events {
+            label = "Game Events  (PlayerEvent)"
+            style = "filled,rounded"
+            fillcolor = "#ecfeff"
+            color = "#0891b2"
+            fontname = "Helvetica-Bold"
+            fontsize = 11
+            rank = same
+
+            ORD [label = "Order\n(upstream flow)",   fillcolor = "#a5f3fc", color = "#0891b2"]
+            SHP [label = "Shipment\n(downstream flow)", fillcolor = "#a5f3fc", color = "#0891b2"]
+        }
+    }
+
+    // ── Supply chain order flow (upstream) ────────────────────────────────
+    CON -> RET [label = "place order →", color = "#dc2626", fontcolor = "#dc2626", style = bold]
+    RET -> WHO [label = "place order →", color = "#dc2626", fontcolor = "#dc2626", style = bold]
+    WHO -> DIS [label = "place order →", color = "#dc2626", fontcolor = "#dc2626", style = bold]
+    DIS -> FAC [label = "place order →", color = "#dc2626", fontcolor = "#dc2626", style = bold]
+
+    // Supply chain shipment flow (downstream) — use invisible intermediate node for clarity
+    FAC -> DIS [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
+    DIS -> WHO [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
+    WHO -> RET [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
+    RET -> CON [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
+
+    // Game manages players and events
+    G -> CON [style = dashed, label = "drives"]
+    G -> ORD [style = dashed, label = "schedules"]
+    G -> SHP [style = dashed, label = "schedules"]
+
+    // PlayerInterface inheritance
+    PIS -> PI [label = "extends", style = dashed, arrowhead = onormal, color = "#9333ea"]
+    CON -> PI [style = dashed, label = "uses", color = "#9333ea"]
+
+    // Standalone → core
+    IW -> INST [label = "controls"]
+
+    // Server → game engine
+    BGS  -> G   [label = "hosts"]
+    BGS  -> PI  [style = invis]
+
+    // Network link
+    PC -> BGS [
+        label = "TCP / JSON  (port 8888)",
+        dir = both,
+        color = "#dc2626",
+        fontcolor = "#dc2626",
+        style = "bold,dashed",
+        penwidth = 2
+    ]
+}

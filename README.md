@@ -1,14 +1,26 @@
 ##### se-03-team-24
 # Beer Game
 
-This project simulates the way beer is being ordered and delivered from production and factory,going to distributor, then wholesaler and then to retailer and consumer. Each of these stages can be played by the students who, order enough beer stock in the position theyhold, taking into consideration shipment times, delays, backorders, inventory such that,every partner in this chain doesn’t suffer any losses.The objective of the game is to satisfy the demand of the customer, while keepingthe cost low. There is a cost for holding inventory and a cost for not satisfying demand(backorder). The demand for the product remains until it is satisfied i.e. backorder persists until it is fulfilled. 
+This project simulates the way beer is being ordered and delivered from production and factory,going to distributor, then wholesaler and then to retailer and consumer. Each of these stages can be played by the students who, order enough beer stock in the position theyhold, taking into consideration shipment times, delays, backorders, inventory such that,every partner in this chain doesn’t suffer any losses. The objective of the game is to satisfy the demand of the customer, while keepingthe cost low. 
 
-The main features in the repository that I received:
-* Created a fully functional game that can be played locally.
+The main features in the repository that I developed:
+* Created a fully functional game that can be played locally from the system level architecture 
 * Added networking capabilities such that the game can be hosted on a server and players can play in LAN in multiple computers. 
 * Added relevant comments in the code for doxygen.
 * Added functionality tests for the game.
 * Updated code organization
+
+### System Architecture
+
+![System Architecture](readme-assets/architecture.png)
+
+The system is built with **Qt (C++)** and consists of three deployable executables sharing a common core game engine:
+
+- **Standalone** (`beergame`) — all five supply chain roles run on one machine, controlled by an Instructor.
+- **Server** (`beergame-server`) — hosts the game via TCP; one `PlayerInterfaceServer` is created per connected client.
+- **Client** (`beergame-client`) — each player connects over TCP/JSON (port 8888) and interacts through `ClientInterface`.
+
+The **supply chain** runs Consumer → Retailer → Wholesaler → Distributor → Factory. Orders flow upstream (red) and shipments flow downstream (green), both scheduled week-by-week by the `Game` class.
 
 ### Building the game
 ```

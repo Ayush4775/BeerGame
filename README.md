@@ -1,7 +1,9 @@
 ##### se-03-team-24
 # Beer Game
 
-In this sprint, we added these main features in the repository that we received:
+This project simulates the way beer is being ordered and delivered from production and factory,going to distributor, then wholesaler and then to retailer and consumer. Each of these stages can be played by the students who, order enough beer stock in the position theyhold, taking into consideration shipment times, delays, backorders, inventory such that,every partner in this chain doesn’t suffer any losses.The objective of the game is to satisfy the demand of the customer, while keepingthe cost low. There is a cost for holding inventory and a cost for not satisfying demand(backorder). The demand for the product remains until it is satisfied i.e. backorder persists until it is fulfilled. 
+
+The main features in the repository that I received:
 * Created a fully functional game that can be played locally.
 * Added networking capabilities such that the game can be hosted on a server and players can play in LAN in multiple computers. 
 * Added relevant comments in the code for doxygen.
@@ -43,5 +45,3 @@ Now, three executables are available:
 ![Server screenshot](readme-assets/server.png)
 #### Client:
 ![Client screenshot](readme-assets/client.png)
-
-[@AYUSH477](https://github.com/AYUSH477)

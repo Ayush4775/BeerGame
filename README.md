@@ -17,10 +17,10 @@ The main features in the repository that I developed:
 The system is built with **Qt (C++)** and consists of three deployable executables sharing a common core game engine:
 
 - **Standalone** (`beergame`) — all five supply chain roles run on one machine, controlled by an Instructor.
-- **Server** (`beergame-server`) — hosts the game via TCP; one `PlayerInterfaceServer` is created per connected client.
-- **Client** (`beergame-client`) — each player connects over TCP/JSON (port 8888) and interacts through `ClientInterface`.
+- **Server** (`beergame-server`) — hosts the game via TCP on a configurable IP and port (default `8888`); one `PlayerInterfaceServer` is created per connected client.
+- **Client** (`beergame-client`) — each player connects over TCP/JSON and interacts through `ClientInterface`.
 
-The **supply chain** runs Consumer → Retailer → Wholesaler → Distributor → Factory. Orders flow upstream (red) and shipments flow downstream (green), both scheduled week-by-week by the `Game` class.
+The **supply chain** runs Consumer → Retailer → Wholesaler → Distributor → Factory. Orders flow upstream (red) and shipments flow downstream (green), both scheduled week-by-week by the `Game` class. Every `Player` is wrapped by a `PlayerInterface`; the server replaces it with `PlayerInterfaceServer` (which extends `PlayerInterface`) to forward events as JSON over a `QTcpSocket`.
 
 ### Building the game
 ```

@@ -102,7 +102,7 @@ digraph BeerGameArchitecture {
 
         // Event sub-cluster
         subgraph cluster_events {
-            label = "Game Events  (PlayerEvent)"
+            label = "Game Events  (PlayerEvent — base class)"
             style = "filled,rounded"
             fillcolor = "#ecfeff"
             color = "#0891b2"
@@ -127,25 +127,26 @@ digraph BeerGameArchitecture {
     WHO -> RET [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
     RET -> CON [label = "← ship", color = "#16a34a", fontcolor = "#16a34a", style = bold]
 
-    // Game manages players and events
-    G -> CON [style = dashed, label = "drives"]
+    // Game manages all player interfaces and schedules events
+    G -> PI  [style = dashed, label = "manages 5×\n(one per role)", color = "#9333ea"]
     G -> ORD [style = dashed, label = "schedules"]
     G -> SHP [style = dashed, label = "schedules"]
 
-    // PlayerInterface inheritance
-    PIS -> PI [label = "extends", style = dashed, arrowhead = onormal, color = "#9333ea"]
-    CON -> PI [style = dashed, label = "uses", color = "#9333ea"]
+    // Each Player is wrapped by a PlayerInterface
+    PI -> RET [style = dashed, label = "wraps Player", color = "#9333ea"]
+
+    // PlayerInterface inheritance (server-side specialisation)
+    PIS -> PI [label = "extends", style = dashed, arrowhead = onormal, color = "#16a34a"]
 
     // Standalone → core
     IW -> INST [label = "controls"]
 
     // Server → game engine
-    BGS  -> G   [label = "hosts"]
-    BGS  -> PI  [style = invis]
+    BGS  -> G   [label = "hosts game(s)"]
 
     // Network link
     PC -> BGS [
-        label = "TCP / JSON  (port 8888)",
+        label = "TCP / JSON  (default port 8888)",
         dir = both,
         color = "#dc2626",
         fontcolor = "#dc2626",
